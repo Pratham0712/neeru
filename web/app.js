@@ -188,9 +188,9 @@ document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("cli
 function initMap() {
   state.map = L.map("map", { zoomControl: false }).setView([12.955, 77.64], 12);
   L.control.zoom({ position: "topright" }).addTo(state.map);
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a> · Rain: <a href="https://open-meteo.com">Open-Meteo</a>',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Rain: <a href="https://open-meteo.com">Open-Meteo</a>',
   }).addTo(state.map);
 
   if (navigator.geolocation) {
