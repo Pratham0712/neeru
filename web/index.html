@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f2a3d">
+  <title>Neeru · Bengaluru flood alerts</title>
+  <meta name="description" content="Know before you ride into it. Live flood risk for Bengaluru underpasses and junctions, verified by citizen photos.">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-kn">ನೀರು</span>
+      <span class="brand-en">Neeru</span>
+    </div>
+    <p class="tagline" data-i18n="tagline">Know before you ride into it.</p>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="en" class="active">EN</button>
+      <button data-lang="kn">ಕನ್ನಡ</button>
+    </div>
+  </header>
+
+  <div id="replay-banner" class="replay-banner" hidden>
+    <span>⛈️</span><span data-i18n="replay">Storm replay demo: rainfall below is simulated.</span>
+  </div>
+
+  <main>
+    <!-- MAP -->
+    <section id="view-map" class="view active">
+      <div id="map" aria-label="Flood risk map"></div>
+      <div class="sheet" id="sheet">
+        <div class="sheet-handle"></div>
+        <div class="summary" id="summary"></div>
+        <h2 class="sheet-title" data-i18n="nearYou">Next 3 hours</h2>
+        <ul class="spot-list" id="spot-list"></ul>
+        <p class="updated" id="updated"></p>
+      </div>
+    </section>
+
+    <!-- REPORT -->
+    <section id="view-report" class="view">
+      <div class="report">
+        <h1 data-i18n="reportTitle">Report waterlogging</h1>
+        <p class="muted" data-i18n="reportHelp">One photo helps every rider behind you. An AI agent checks it against live rainfall before it goes on the map.</p>
+
+        <label class="camera" id="camera">
+          <input type="file" id="photo" accept="image/*" capture="environment" hidden>
+          <img id="preview" alt="" hidden>
+          <span class="camera-cta" id="camera-cta">
+            <span class="camera-icon">📸</span>
+            <span data-i18n="takePhoto">Take a photo of the road</span>
+          </span>
+        </label>
+
+        <button class="secondary" id="locate"><span>📍</span> <span data-i18n="useLocation">Use my location</span></button>
+        <p class="muted small" id="loc-status"></p>
+
+        <button class="primary" id="submit" disabled data-i18n="send">Send report</button>
+
+        <div class="checking" id="checking" hidden>
+          <ol>
+            <li data-step="0" data-i18n="step1">Looking at your photo</li>
+            <li data-step="1" data-i18n="step2">Checking live rainfall here</li>
+            <li data-step="2" data-i18n="step3">Comparing with nearby reports</li>
+          </ol>
+        </div>
+
+        <div class="verdict" id="verdict" hidden></div>
+      </div>
+    </section>
+
+    <!-- OPS -->
+    <section id="view-ops" class="view">
+      <div class="ops">
+        <h1 data-i18n="opsTitle">Dispatch priority</h1>
+        <p class="muted" data-i18n="opsHelp">For ward engineers and traffic police: where to send pumps and staff first. Ranked by risk × road importance × verified citizen reports.</p>
+        <div class="tiles" id="tiles"></div>
+        <ol class="dispatch" id="dispatch"></ol>
+      </div>
+    </section>
+  </main>
+
+  <div class="detail" id="detail" hidden>
+    <div class="detail-card" role="dialog" aria-modal="true">
+      <button class="close" id="detail-close" aria-label="Close">×</button>
+      <div id="detail-body"></div>
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button data-view="map" class="active"><span>🗺️</span><span data-i18n="tabMap">Map</span></button>
+    <button data-view="report" class="report-tab"><span>📸</span><span data-i18n="tabReport">Report</span></button>
+    <button data-view="ops"><span>🚧</span><span data-i18n="tabOps">Ops</span></button>
+  </nav>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+[
+  {"id": "kr-circle", "name": "K.R. Circle Underpass", "name_kn": "ಕೆ.ಆರ್. ವೃತ್ತ ಅಂಡರ್‌ಪಾಸ್", "lat": 12.97660, "lon": 77.58750, "kind": "underpass", "importance": 3, "threshold_mm": 18, "drain_hours": 1.5},
+  {"id": "okalipuram", "name": "Okalipuram Underpass", "name_kn": "ಓಕಳೀಪುರಂ ಅಂಡರ್‌ಪಾಸ್", "lat": 12.98400, "lon": 77.56500, "kind": "underpass", "importance": 3, "threshold_mm": 18, "drain_hours": 1.5},
+  {"id": "panathur-rub", "name": "Panathur Railway Underpass", "name_kn": "ಪಣತ್ತೂರು ರೈಲ್ವೆ ಅಂಡರ್‌ಪಾಸ್", "lat": 12.93700, "lon": 77.70300, "kind": "underpass", "importance": 3, "threshold_mm": 16, "drain_hours": 2.0},
+  {"id": "kundalahalli", "name": "Kundalahalli Underpass", "name_kn": "ಕುಂದಲಹಳ್ಳಿ ಅಂಡರ್‌ಪಾಸ್", "lat": 12.96200, "lon": 77.71400, "kind": "underpass", "importance": 3, "threshold_mm": 18, "drain_hours": 1.5},
+  {"id": "silk-board", "name": "Silk Board Junction", "name_kn": "ಸಿಲ್ಕ್ ಬೋರ್ಡ್ ಜಂಕ್ಷನ್", "lat": 12.91720, "lon": 77.62290, "kind": "junction", "importance": 3, "threshold_mm": 26, "drain_hours": 1.0},
+  {"id": "hebbal", "name": "Hebbal Flyover (Esteem Mall side)", "name_kn": "ಹೆಬ್ಬಾಳ ಫ್ಲೈಓವರ್", "lat": 13.03580, "lon": 77.59700, "kind": "junction", "importance": 3, "threshold_mm": 28, "drain_hours": 1.0},
+  {"id": "nagawara", "name": "Nagawara Junction", "name_kn": "ನಾಗವಾರ ಜಂಕ್ಷನ್", "lat": 13.04200, "lon": 77.62500, "kind": "junction", "importance": 2, "threshold_mm": 28, "drain_hours": 1.0},
+  {"id": "bellandur-orr", "name": "Bellandur ORR (Ecospace)", "name_kn": "ಬೆಳ್ಳಂದೂರು ಹೊರವರ್ತುಲ ರಸ್ತೆ (ಇಕೋಸ್ಪೇಸ್)", "lat": 12.92600, "lon": 77.68100, "kind": "road", "importance": 3, "threshold_mm": 24, "drain_hours": 1.5},
+  {"id": "marathahalli", "name": "Marathahalli Bridge, ORR", "name_kn": "ಮಾರತಹಳ್ಳಿ ಸೇತುವೆ, ಹೊರವರ್ತುಲ ರಸ್ತೆ", "lat": 12.95600, "lon": 77.70100, "kind": "road", "importance": 3, "threshold_mm": 28, "drain_hours": 1.0},
+  {"id": "yemalur", "name": "Yemalur Main Road", "name_kn": "ಯೆಮಲೂರು ಮುಖ್ಯ ರಸ್ತೆ", "lat": 12.95300, "lon": 77.68900, "kind": "road", "importance": 2, "threshold_mm": 22, "drain_hours": 2.0},
+  {"id": "sai-layout", "name": "Sai Layout, Horamavu", "name_kn": "ಸಾಯಿ ಲೇಔಟ್, ಹೊರಮಾವು", "lat": 13.03000, "lon": 77.66400, "kind": "road", "importance": 1, "threshold_mm": 20, "drain_hours": 2.5},
+  {"id": "bommanahalli", "name": "Bommanahalli, Hosur Road", "name_kn": "ಬೊಮ್ಮನಹಳ್ಳಿ, ಹೊಸೂರು ರಸ್ತೆ", "lat": 12.90100, "lon": 77.62400, "kind": "road", "importance": 3, "threshold_mm": 28, "drain_hours": 1.0},
+  {"id": "ejipura", "name": "Ejipura / ST Bed, Koramangala", "name_kn": "ಈಜಿಪುರ / ಎಸ್.ಟಿ. ಬೆಡ್, ಕೋರಮಂಗಲ", "lat": 12.93900, "lon": 77.62900, "kind": "road", "importance": 2, "threshold_mm": 24, "drain_hours": 1.5},
+  {"id": "hsr-agara", "name": "HSR Layout Sector 6 (Agara side)", "name_kn": "ಎಚ್‌ಎಸ್‌ಆರ್ ಲೇಔಟ್ ಸೆಕ್ಟರ್ 6 (ಅಗರ)", "lat": 12.92000, "lon": 77.64400, "kind": "road", "importance": 2, "threshold_mm": 24, "drain_hours": 1.5},
+  {"id": "kasturi-nagar", "name": "Kasturi Nagar, Old Madras Road", "name_kn": "ಕಸ್ತೂರಿ ನಗರ, ಹಳೆ ಮದ್ರಾಸ್ ರಸ್ತೆ", "lat": 13.00300, "lon": 77.66000, "kind": "road", "importance": 2, "threshold_mm": 28, "drain_hours": 1.0},
+  {"id": "varthur-kodi", "name": "Varthur Kodi", "name_kn": "ವರ್ತೂರು ಕೋಡಿ", "lat": 12.94000, "lon": 77.74700, "kind": "road", "importance": 2, "threshold_mm": 22, "drain_hours": 2.0}
+]

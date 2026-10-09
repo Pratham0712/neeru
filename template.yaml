@@ -1,0 +1,211 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Neeru - flood alerts for Bengaluru riders, verified by citizens (Environmental Hacks 2026)
+
+Parameters:
+  TelegramBotToken:
+    Type: String
+    NoEcho: true
+    Description: Token from @BotFather
+  TelegramSecret:
+    Type: String
+    NoEcho: true
+    MinLength: 16
+    AllowedPattern: "^[A-Za-z0-9_-]+$"
+    Description: Random string Telegram sends with every webhook call (letters, digits, _ and - only)
+  AdminToken:
+    Type: String
+    NoEcho: true
+    MinLength: 16
+    Description: Protects /admin routes (storm replay, manual refresh)
+  ModelId:
+    Type: String
+    Default: global.anthropic.claude-haiku-4-5-20251001-v1:0
+    Description: Vision-capable Bedrock model or inference profile ID (Bedrock console -> Inference profiles)
+  AlertEmail:
+    Type: String
+    Default: ""
+    Description: Optional ops email that receives red alerts via SNS
+
+Conditions:
+  HasAlertEmail: !Not [!Equals [!Ref AlertEmail, ""]]
+
+Globals:
+  Function:
+    Runtime: python3.12
+    CodeUri: src/
+    Timeout: 30
+    MemorySize: 1024
+    Architectures: [x86_64]
+    Environment:
+      Variables:
+        HOTSPOTS_TABLE: !Ref HotspotsTable
+        REPORTS_TABLE: !Ref ReportsTable
+        SUBS_TABLE: !Ref SubscriptionsTable
+        SESSIONS_TABLE: !Ref SessionsTable
+        PHOTOS_BUCKET: !Ref PhotosBucket
+        ALERTS_TOPIC_ARN: !Ref AlertsTopic
+        TELEGRAM_BOT_TOKEN: !Ref TelegramBotToken
+        TELEGRAM_SECRET: !Ref TelegramSecret
+        ADMIN_TOKEN: !Ref AdminToken
+        MODEL_ID: !Ref ModelId
+
+Resources:
+  # ---------------- data ----------------
+  HotspotsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{AttributeName: id, AttributeType: S}]
+      KeySchema: [{AttributeName: id, KeyType: HASH}]
+
+  ReportsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - {AttributeName: hotspot_id, AttributeType: S}
+        - {AttributeName: sk, AttributeType: S}
+      KeySchema:
+        - {AttributeName: hotspot_id, KeyType: HASH}
+        - {AttributeName: sk, KeyType: RANGE}
+
+  SubscriptionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - {AttributeName: hotspot_id, AttributeType: S}
+        - {AttributeName: chat_id, AttributeType: N}
+      KeySchema:
+        - {AttributeName: hotspot_id, KeyType: HASH}
+        - {AttributeName: chat_id, KeyType: RANGE}
+      GlobalSecondaryIndexes:
+        - IndexName: by-chat
+          KeySchema:
+            - {AttributeName: chat_id, KeyType: HASH}
+            - {AttributeName: hotspot_id, KeyType: RANGE}
+          Projection: {ProjectionType: ALL}
+
+  SessionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: [{AttributeName: chat_id, AttributeType: S}]
+      KeySchema: [{AttributeName: chat_id, KeyType: HASH}]
+      TimeToLiveSpecification: {AttributeName: expires_at, Enabled: true}
+
+  PhotosBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - {Id: expire-photos, Status: Enabled, ExpirationInDays: 30}
+
+  AlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: Neeru flood alerts
+
+  AlertsEmailSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: HasAlertEmail
+    Properties:
+      TopicArn: !Ref AlertsTopic
+      Protocol: email
+      Endpoint: !Ref AlertEmail
+
+  # ---------------- API ----------------
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins: ["*"]
+        AllowMethods: [GET, POST, OPTIONS]
+        AllowHeaders: [content-type, x-admin-token]
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 20
+        ThrottlingRateLimit: 10
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers.api.handler
+      Description: Web app API and admin routes
+      Policies:
+        - DynamoDBCrudPolicy: {TableName: !Ref HotspotsTable}
+        - DynamoDBCrudPolicy: {TableName: !Ref ReportsTable}
+        - DynamoDBReadPolicy: {TableName: !Ref SubscriptionsTable}
+        - S3CrudPolicy: {BucketName: !Ref PhotosBucket}
+        - SNSPublishMessagePolicy: {TopicName: !GetAtt AlertsTopic.TopicName}
+        - Statement:
+            - Effect: Allow
+              Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+              Resource: "*"
+            - Effect: Allow
+              Action: [aws-marketplace:ViewSubscriptions, aws-marketplace:Subscribe]
+              Resource: "*"
+      Events:
+        Hotspots: {Type: HttpApi, Properties: {ApiId: !Ref HttpApi, Path: /hotspots, Method: GET}}
+        Hotspot: {Type: HttpApi, Properties: {ApiId: !Ref HttpApi, Path: "/hotspots/{id}", Method: GET}}
+        Priority: {Type: HttpApi, Properties: {ApiId: !Ref HttpApi, Path: /priority, Method: GET}}
+        Reports: {Type: HttpApi, Properties: {ApiId: !Ref HttpApi, Path: /reports, Method: POST}}
+        Replay: {Type: HttpApi, Properties: {ApiId: !Ref HttpApi, Path: /admin/replay, Method: POST}}
+        Refresh: {Type: HttpApi, Properties: {ApiId: !Ref HttpApi, Path: /admin/refresh, Method: POST}}
+
+  TelegramFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers.telegram_webhook.handler
+      Description: Telegram bot webhook (English + Kannada)
+      Timeout: 60
+      Policies:
+        - DynamoDBCrudPolicy: {TableName: !Ref HotspotsTable}
+        - DynamoDBCrudPolicy: {TableName: !Ref ReportsTable}
+        - DynamoDBCrudPolicy: {TableName: !Ref SubscriptionsTable}
+        - DynamoDBCrudPolicy: {TableName: !Ref SessionsTable}
+        - S3CrudPolicy: {BucketName: !Ref PhotosBucket}
+        - SNSPublishMessagePolicy: {TopicName: !GetAtt AlertsTopic.TopicName}
+        - Statement:
+            - Effect: Allow
+              Action: [bedrock:InvokeModel, bedrock:InvokeModelWithResponseStream]
+              Resource: "*"
+            - Effect: Allow
+              Action: [aws-marketplace:ViewSubscriptions, aws-marketplace:Subscribe]
+              Resource: "*"
+      Events:
+        Webhook: {Type: HttpApi, Properties: {ApiId: !Ref HttpApi, Path: /telegram, Method: POST}}
+
+  RefreshFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handlers.refresh.handler
+      Description: Every 15 min - rainfall to risk to alerts
+      Timeout: 120
+      Policies:
+        - DynamoDBCrudPolicy: {TableName: !Ref HotspotsTable}
+        - DynamoDBReadPolicy: {TableName: !Ref ReportsTable}
+        - DynamoDBReadPolicy: {TableName: !Ref SubscriptionsTable}
+        - SNSPublishMessagePolicy: {TopicName: !GetAtt AlertsTopic.TopicName}
+      Events:
+        Every15Minutes:
+          Type: Schedule
+          Properties:
+            Schedule: rate(15 minutes)
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  TelegramWebhookUrl:
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/telegram"
+  HotspotsTableName:
+    Value: !Ref HotspotsTable
+  AlertsTopicArn:
+    Value: !Ref AlertsTopic
+  PhotosBucketName:
+    Value: !Ref PhotosBucket
