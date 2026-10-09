@@ -34,9 +34,21 @@
       <div id="map" aria-label="Flood risk map"></div>
       <div class="sheet" id="sheet">
         <div class="sheet-handle"></div>
-        <div class="summary" id="summary"></div>
-        <h2 class="sheet-title" data-i18n="nearYou">Next 3 hours</h2>
-        <ul class="spot-list" id="spot-list"></ul>
+        <button class="route-cta" id="route-start"><span>🧭</span> <span data-i18n="routeCta">Safe route: is my ride flooded?</span></button>
+        <div class="route-panel" id="route-panel" hidden>
+          <div class="route-head">
+            <b data-i18n="routeTitle">Safe route</b>
+            <button class="link" id="route-cancel" data-i18n="cancel">Cancel</button>
+          </div>
+          <p class="route-step" id="route-step"></p>
+          <button class="secondary small-btn" id="route-from-me" data-i18n="fromMe">📍 Start from my location</button>
+          <div class="route-result" id="route-result"></div>
+        </div>
+        <div id="sheet-default">
+          <div class="summary" id="summary"></div>
+          <h2 class="sheet-title" data-i18n="nearYou">Next 3 hours</h2>
+          <ul class="spot-list" id="spot-list"></ul>
+        </div>
         <p class="updated" id="updated"></p>
       </div>
     </section>
@@ -79,6 +91,14 @@
         <h1 data-i18n="opsTitle">Dispatch priority</h1>
         <p class="muted" data-i18n="opsHelp">For ward engineers and traffic police: where to send pumps and staff first. Ranked by risk × road importance × verified citizen reports.</p>
         <div class="tiles" id="tiles"></div>
+        <div class="copilot" id="copilot">
+          <div class="copilot-head">
+            <span class="copilot-badge">🤖 <span data-i18n="copilot">Ops Copilot</span></span>
+            <button class="primary small-btn" id="briefing-btn" data-i18n="getBriefing">Get dispatch briefing</button>
+          </div>
+          <div id="briefing"></div>
+        </div>
+        <h2 class="sheet-title" data-i18n="priorityList">Priority list</h2>
         <ol class="dispatch" id="dispatch"></ol>
       </div>
     </section>

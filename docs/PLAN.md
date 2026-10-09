@@ -1,31 +1,35 @@
-# Weekend plan — QuantumEffect
+# Weekend plan — solo (Pratham)
 
-Deadline: Sunday Oct 11 (exact time on the schedule page; plan to submit by **Sunday 2 PM**).
+Deadline: Sunday Oct 11 (exact time on the schedule page; submissions open 8 AM, plan to submit by **Sunday 2 PM**).
 Rule of the weekend: **stop adding features Saturday 10 PM.** Sunday is video, writeup, blog, submit.
 
-## Thursday night (tonight)
-- [ ] Both: Builder Center student verification · Rishikesh accepts the team invite with his own account
-- [ ] Pratham: AWS account (ap-south-1), Bedrock Claude Haiku 4.5 playground once, AWS + SAM CLI
-- [ ] Pratham: create GitHub repo `neeru`, push this code, **commit often all weekend** (history must match event dates)
-- [ ] Pratham: `pytest`, then `sam build && sam deploy --guided`, seed, set webhook → `/start` works in Telegram
-- [ ] Rishikesh: run `python scripts/local_demo.py`, click through every screen, list what feels confusing
-- [ ] Rishikesh: verify all 16 coordinates in `data/hotspots.json` on Google Maps (drop the pin exactly on the dip/underpass)
+## Friday (today)
+- [x] Code on GitHub from the project root, 68 tests passing, local demo running
+- [ ] Builder Center student verification (needed for the Amazon fast-track) · cancel the pending teammate invite
+- [ ] AWS: IAM user + `aws configure`, Bedrock Haiku 4.5 answers in the playground, copy inference profile ID
+- [ ] Telegram bot from @BotFather
+- [ ] `sam build` → `sam deploy --guided` → seed → webhook → `/admin/refresh` → `/start` works in Telegram
+- [ ] Real photo through the bot → verdict; check CloudWatch logs show the agent's tool calls
+- [ ] Web app on Amplify; open it on your phone
 
-## Friday — make the core loop real
-- [ ] Pratham: first real photo through Telegram → agent verdict in CloudWatch logs; tune the system prompt on 10+ photos (flooded, dry, screenshot, meme, indoor, night)
-- [ ] Pratham: check Haiku latency; if > 20 s, cut `nearby_reports` or raise memory
-- [ ] Rishikesh: Kannada proofread (bot + web), deploy web to Amplify, test on 3 phones (Android Chrome, iPhone Safari, low-end)
-- [ ] Rishikesh: collect 15–20 test photos (your own; news photos only for testing, never in the video without credit)
-- [ ] Both: subscribe your own Telegram accounts to 2–3 spots; run storm replay; confirm alerts arrive and SNS email works
+## Saturday morning — make it real
+- [ ] Check all 16 coordinates in `data/hotspots.json` on Google Maps (pin on the dip/underpass), re-seed
+- [ ] Add 3–5 spots you personally know (your area, BMSCE / Basavanagudi side)
+- [ ] Test the verifier with 10+ photos: flooded, dry, screenshot, meme, indoor, night. Tune the prompt if needed
+- [ ] Safe Route: try 5 real trips (e.g. HSR → Hebbal, Koramangala → Whitefield) with storm replay on and off
+- [ ] Ops Copilot: generate a briefing during storm replay; check it names only real spots
 
-## Saturday — polish what judges see
-- [ ] Usability pass with 2 people outside the team (hand them the bot with zero explanation, watch, fix)
-- [ ] Add 4–6 more real hotspots you personally know (your area, BMSCE side)
-- [ ] Stretch only if everything above is solid: "/route" check between two locations, or a WhatsApp link
-- [ ] Record raw demo footage in the evening while it still works; **feature freeze 10 PM**
+## Saturday afternoon — make it usable
+- [ ] Hand the bot and web app to 2 friends with zero explanation; fix whatever confuses them
+- [ ] Ask a Kannada-speaking friend to read the bot + web text (`src/neeru/i18n.py`, `web/app.js`)
+- [ ] Open the CloudWatch dashboard (stack output `DashboardUrl`); make sure graphs have data
+
+## Saturday evening
+- [ ] Record all demo footage (follow `docs/DEMO_SCRIPT.md`) while everything works
+- [ ] **Feature freeze 10 PM**
 
 ## Sunday — ship
-- [ ] Edit video (follow `docs/DEMO_SCRIPT.md`), upload, test signed-out
-- [ ] Writeup from `docs/WRITEUP.md`, fill "What fought back" honestly
-- [ ] Blog from `docs/BLOG_OUTLINE.md`, publish on Builder Center
-- [ ] Repo: README links, screenshots, public visibility · submit · double-check every link
+- [ ] Edit video (< 3:00), upload to YouTube (public/unlisted), test the link signed-out
+- [ ] Writeup from `docs/WRITEUP.md` — fill "What fought back" honestly
+- [ ] Blog on AWS Builder Center from `docs/BLOG_OUTLINE.md` (top 5 blogs win AirPods)
+- [ ] README: add live URL, bot handle, 3 screenshots · repo public · submit · re-check every link

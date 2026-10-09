@@ -29,7 +29,7 @@ mock = mock_aws()
 mock.start()
 
 from tests.conftest import create_fake_aws  # noqa: E402  same tables as the tests
-from neeru import store, verifier  # noqa: E402
+from neeru import briefing, store, verifier  # noqa: E402
 from handlers import api  # noqa: E402
 
 create_fake_aws()
@@ -50,6 +50,23 @@ def stand_in_verify(image_bytes, image_format, lat, lon, hotspot, lang="en"):
 
 
 verifier.verify = stand_in_verify
+
+
+class StandInCopilot:
+    """Calls the real tools in the real order, then submits a canned briefing (no Bedrock locally)."""
+
+    def __call__(self, _prompt):
+        spots = briefing.get_dispatch_list()["spots"]
+        for spot in spots[:2]:
+            briefing.get_spot_reports(spot["id"])
+        actions = [{"spot_id": s["id"], "action": "deploy_pump" if s["kind"] == "underpass" else "divert_traffic",
+                    "reason": "Local demo: " + "; ".join(s["drivers"])} for s in spots[:3]]
+        briefing.submit_briefing(f"Local demo: {spots[0]['name']} first.", actions,
+                                 "Local demo briefing (the deployed app writes this with Bedrock).",
+                                 "ಸ್ಥಳೀಯ ಡೆಮೊ ವರದಿ.")
+
+
+briefing.build_agent = StandInCopilot
 api.handler({"routeKey": "POST /admin/refresh", "headers": {"x-admin-token": os.environ["ADMIN_TOKEN"]}}, None)
 
 

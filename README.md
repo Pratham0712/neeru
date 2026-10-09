@@ -14,7 +14,8 @@ next 3 hours?"** It also tells ward engineers **where to send pumps first**.
 |---|---|
 | **Riders** | Telegram bot in **English and ಕನ್ನಡ** (no app to install) and a mobile web map. Share your location: see the risk at the spots near you for the next 3 hours. Tap **Alert me** and get a message *before* a spot turns red. |
 | **Citizens** | Send a photo of a waterlogged road. An **AI agent** checks it: is it a real street photo, how deep is the water (ankle / tyre-hub / knee), does live rainfall back it up, do other reports agree? Confirmed reports go on the map within seconds, and a report far from known spots **adds a new spot to the map**. |
-| **Ward engineers / traffic police** | **Dispatch priority** list: risk × road importance × verified citizen reports. Red alerts also go out on an SNS topic (email/SMS). |
+| **Riders, before they leave** | **🧭 Safe Route**: tap a start and a destination. Neeru fetches the fastest route and its alternatives, checks every one against live flood risk, and says *"the fastest route goes through Silk Board (Avoid); the safer one takes 6 more minutes and avoids every red spot."* |
+| **Ward engineers / traffic police** | **Dispatch priority** list (risk × road importance × verified reports), and **🤖 Ops Copilot**: a second agent that writes a dispatch briefing in English and ಕನ್ನಡ (pump here, divert traffic there, and why), ready for the ward WhatsApp group. Red alerts also go out on SNS. |
 
 ### The risk model is simple, explainable, and learns
 Each spot has a **flood threshold** (mm of rain load) and a **drain half-life**.
@@ -47,10 +48,16 @@ flowchart LR
   L3 --> DDB
   L3 -->|red alert| SNS[SNS topic<br/>ops email/SMS]
   L3 -->|red alert| TG
+  L1 -->|Safe Route| OSRM[(OSRM<br/>road routing)]
+  L1 --> CP{{Ops Copilot agent<br/>Strands Agents SDK}}
+  CP --> BR
+  CP --> DDB
+  L1 & L2 & L3 -.->|EMF metrics, X-Ray traces| CW[CloudWatch<br/>dashboard + alarm]
 ```
 
 **AWS used:** Strands Agents SDK (AWS open source), Amazon Bedrock, Lambda, API Gateway (HTTP API),
-DynamoDB, S3, EventBridge, SNS, Amplify Hosting, CloudWatch Logs, deployed with **AWS SAM**.
+DynamoDB, S3, EventBridge, SNS, Amplify Hosting, CloudWatch (dashboard, custom metrics via EMF, alarm),
+AWS X-Ray (tracing on every function), all deployed with **AWS SAM**.
 
 ## The verifier agent
 [`src/neeru/verifier.py`](src/neeru/verifier.py) — a Strands agent with a step-by-step procedure in its
@@ -63,6 +70,24 @@ system prompt and three tools:
 Only **valid, confident (≥ 0.6)** verdicts can move the map. If Bedrock is down, the report is kept as
 unverified and nothing breaks. Text inside photos is treated as data, never as instructions.
 
+## The Ops Copilot agent
+[`src/neeru/briefing.py`](src/neeru/briefing.py), the second Strands agent. Its tools are `get_dispatch_list()`,
+`get_spot_reports(spot_id)` and `submit_briefing(...)`. It may only use five action types (pump, divert, close,
+clear drain, monitor), and `submit_briefing` **rejects any spot or action the data did not contain**, so it
+cannot invent a location. Briefings are cached until the situation changes, an all-clear never calls the
+model, and if Bedrock fails the briefing falls back to the priority list straight from the data.
+
+## Safe Route
+[`src/neeru/routing.py`](src/neeru/routing.py): OSRM returns the fastest route and up to 2 alternatives;
+each route's polyline is checked against every hotspot (point-to-segment distance on a local km grid,
+350 m radius); routes are ranked by red spots, then amber spots, then peak risk, then time.
+
+## Observability
+Every Lambda is traced with **X-Ray**. The code emits custom metrics through CloudWatch **Embedded Metric
+Format** (red/amber spots, reports by outcome, agent latency, threshold calibrations, route verdicts) at
+no extra API cost. `template.yaml` creates a **CloudWatch dashboard** for them, plus an **alarm** on bot
+errors that notifies the ops SNS topic. The link is in the stack output `DashboardUrl`.
+
 ## Run it
 
 ### 0. Prerequisites
@@ -72,7 +97,7 @@ In the Bedrock console (Mumbai), open the playground once with **Claude Haiku 4.
 ### 1. Try it locally (no AWS needed)
 ```bash
 pip install -r requirements-dev.txt
-python -m pytest            # 49 tests
+python -m pytest            # 68 tests
 python scripts/local_demo.py   # http://localhost:8000 — fake AWS, storm replay, stand-in verifier
 ```
 
@@ -111,6 +136,8 @@ Replayed rain is **labelled everywhere it appears** (banner on the map, note on 
 | `GET /hotspots/{id}` | one spot + citizen photos from the last 6 h (presigned links) |
 | `GET /priority` | red/amber spots in dispatch order |
 | `POST /reports` | `{lat, lon, image_base64, lang}` → agent verdict |
+| `GET /route?from=lat,lon&to=lat,lon` | Safe Route: routes ranked by flood risk, with a verdict |
+| `POST /ops/briefing` | Ops Copilot briefing (cached; `{"force": true}` with `x-admin-token` regenerates) |
 | `POST /telegram` | bot webhook (secret-token protected, de-duplicated) |
 | `POST /admin/replay`, `POST /admin/refresh` | `x-admin-token` header |
 
@@ -123,10 +150,12 @@ main variable cost is Bedrock at a fraction of a rupee per verified photo with H
   data. Coordinates are approximate. The thresholds are designed to be corrected by citizen reports.
 - Open-Meteo is a global model; it misses very local cloudbursts. That gap is exactly why citizen
   photos can override it.
+- Safe Route uses the public OSRM demo server and car routing as a stand-in for two-wheelers. A
+  production version would self-host OSRM with a two-wheeler profile.
 - Depth from a photo is an estimate. The agent is told to pick the shallower option when unsure.
 
 ## Built with
-AWS SAM, Strands Agents SDK, Amazon Bedrock, Open-Meteo, Leaflet, OpenStreetMap / CARTO tiles.
+AWS SAM, Strands Agents SDK, Amazon Bedrock, Open-Meteo, OSRM, Leaflet, OpenStreetMap.
 AI coding assistant used: **Claude (Anthropic)** for scaffolding and review.
 
-Team **QuantumEffect** — Pratham Patil, Rishikesh Bulagouda.
+Built by **Pratham Patil** (team QuantumEffect), BMS College of Engineering, Bengaluru.

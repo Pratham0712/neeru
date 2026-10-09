@@ -4,6 +4,8 @@ GET  /hotspots          every hotspot with its current risk (the map)
 GET  /hotspots/{id}     one hotspot plus recent citizen reports with photo links
 GET  /priority          dispatch list for ward engineers, most urgent first
 POST /reports           a citizen photo from the web app: {lat, lon, image_base64, lang}
+GET  /route             Safe Route: ?from=lat,lon&to=lat,lon -> routes ranked by flood risk
+POST /ops/briefing      Ops Copilot dispatch briefing (cached; {"force": true} regenerates)
 POST /admin/replay      start/stop a labelled storm replay (header x-admin-token)
 POST /admin/refresh     recompute all risk now (header x-admin-token)
 """
@@ -17,7 +19,7 @@ from datetime import timedelta
 
 import boto3
 
-from neeru import config, engine, images, store
+from neeru import briefing, config, engine, geo, images, metrics, routing, store
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
@@ -143,7 +145,40 @@ def admin_refresh(event):
     return respond(200, engine.refresh_all())
 
 
+def parse_point(text: str | None) -> tuple[float, float] | None:
+    """'12.93,77.62' -> (12.93, 77.62), or None if it is not a point in Bengaluru."""
+    try:
+        lat, lon = (float(part) for part in (text or "").split(","))
+    except ValueError:
+        return None
+    return (lat, lon) if geo.in_bengaluru(lat, lon) else None
+
+
+def safe_route(event):
+    params = event.get("queryStringParameters") or {}
+    origin, destination = parse_point(params.get("from")), parse_point(params.get("to"))
+    if not origin or not destination:
+        return respond(400, {"error": "from and to must be lat,lon points inside Bengaluru"})
+    if geo.distance_km(*origin, *destination) < 0.2:
+        return respond(400, {"error": "start and destination are too close"})
+
+    routes = routing.fetch_routes(origin, destination)
+    if routes is None:
+        return respond(502, {"error": "route service unavailable, try again in a minute"})
+    result = routing.plan(routes, store.list_hotspots())
+    metrics.emit({"RouteChecks": 1}, Verdict=result["verdict"])
+    return respond(200, {**result, "storm_replay": store.active_storm_replay()})
+
+
+def ops_briefing(event):
+    body = read_json(event)
+    force = bool(body.get("force")) and is_admin(event)  # anyone can read; only admins can force a new one
+    return respond(200, briefing.get_briefing(force=force))
+
+
 ROUTES = {
+    "GET /route": safe_route,
+    "POST /ops/briefing": ops_briefing,
     "GET /hotspots": list_hotspots,
     "GET /hotspots/{id}": get_hotspot,
     "GET /priority": priority,

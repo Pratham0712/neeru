@@ -54,6 +54,32 @@ const TEXT = {
     noApi: "API URL not set. Run scripts/build_web.py.",
     verifiedReports: (n) => `${n} verified photo${n === 1 ? "" : "s"}`,
     kinds: { underpass: "Underpass", junction: "Junction", road: "Road", citizen: "Citizen-found" },
+    routeCta: "Safe route: is my ride flooded?",
+    routeTitle: "Safe route",
+    cancel: "Cancel",
+    fromMe: "📍 Start from my location",
+    tapStart: "Tap your starting point on the map.",
+    tapEnd: "Now tap where you're going.",
+    routing: "Checking routes against live flood risk…",
+    routeFailed: "Couldn't get routes right now. Try again in a minute.",
+    vClear: "Your fastest route is clear",
+    vClearSub: "No amber or red spots on the way.",
+    vDetour: "Take the safer route",
+    vDetourSub: (min, names) => `+${min} min, but it avoids ${names}.`,
+    vCaution: "Ride with caution",
+    vCautionSub: "The best route still passes amber spots. Go slow at the dips.",
+    vNoSafe: "Every route passes a flooded spot",
+    vNoSafeSub: "If you can, wait it out or take public transport.",
+    routeOption: (i) => `Route ${i + 1}`,
+    fastest: "fastest", recommended: "recommended",
+    passes: (n) => (n ? `passes ${n} risky spot${n === 1 ? "" : "s"}` : "no risky spots"),
+    copilot: "Ops Copilot",
+    getBriefing: "Get dispatch briefing",
+    briefingLoading: "Ops Copilot is reading the dispatch list and citizen reports…",
+    briefingFailed: "Briefing unavailable right now.",
+    priorityList: "Priority list",
+    generatedAt: (m, cached) => `${m < 1 ? "Just now" : `${m} min ago`}${cached ? " · cached" : ""}`,
+    actions: { deploy_pump: "Pump", divert_traffic: "Divert", close_underpass: "Close", clear_drain: "Clear drain", monitor: "Monitor" },
   },
   kn: {
     tagline: "ಹೋಗುವ ಮೊದಲೇ ತಿಳಿಯಿರಿ.",
@@ -102,6 +128,32 @@ const TEXT = {
     noApi: "API URL ಹೊಂದಿಸಿಲ್ಲ.",
     verifiedReports: (n) => `${n} ದೃಢಪಟ್ಟ ಫೋಟೋ`,
     kinds: { underpass: "ಅಂಡರ್‌ಪಾಸ್", junction: "ಜಂಕ್ಷನ್", road: "ರಸ್ತೆ", citizen: "ನಾಗರಿಕರು ಕಂಡದ್ದು" },
+    routeCta: "ಸುರಕ್ಷಿತ ದಾರಿ: ನನ್ನ ದಾರಿಯಲ್ಲಿ ನೀರಿದೆಯೇ?",
+    routeTitle: "ಸುರಕ್ಷಿತ ದಾರಿ",
+    cancel: "ರದ್ದುಮಾಡಿ",
+    fromMe: "📍 ನನ್ನ ಸ್ಥಳದಿಂದ ಪ್ರಾರಂಭಿಸಿ",
+    tapStart: "ನಕ್ಷೆಯಲ್ಲಿ ನಿಮ್ಮ ಪ್ರಾರಂಭದ ಸ್ಥಳವನ್ನು ಒತ್ತಿ.",
+    tapEnd: "ಈಗ ನೀವು ಹೋಗುವ ಸ್ಥಳವನ್ನು ಒತ್ತಿ.",
+    routing: "ದಾರಿಗಳನ್ನು ಈಗಿನ ನೀರಿನ ಅಪಾಯದೊಂದಿಗೆ ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇನೆ…",
+    routeFailed: "ಸದ್ಯಕ್ಕೆ ದಾರಿ ಸಿಗಲಿಲ್ಲ. ಒಂದು ನಿಮಿಷದ ನಂತರ ಪ್ರಯತ್ನಿಸಿ.",
+    vClear: "ನಿಮ್ಮ ವೇಗದ ದಾರಿ ಸುರಕ್ಷಿತವಾಗಿದೆ",
+    vClearSub: "ದಾರಿಯಲ್ಲಿ ಯಾವುದೇ ಅಪಾಯದ ಸ್ಥಳಗಳಿಲ್ಲ.",
+    vDetour: "ಸುರಕ್ಷಿತ ದಾರಿಯಲ್ಲಿ ಹೋಗಿ",
+    vDetourSub: (min, names) => `+${min} ನಿಮಿಷ, ಆದರೆ ${names} ತಪ್ಪಿಸುತ್ತದೆ.`,
+    vCaution: "ಎಚ್ಚರಿಕೆಯಿಂದ ಹೋಗಿ",
+    vCautionSub: "ಉತ್ತಮ ದಾರಿಯಲ್ಲೂ ಹಳದಿ ಸ್ಥಳಗಳಿವೆ. ತಗ್ಗುಗಳಲ್ಲಿ ನಿಧಾನವಾಗಿ ಹೋಗಿ.",
+    vNoSafe: "ಎಲ್ಲಾ ದಾರಿಗಳಲ್ಲೂ ನೀರು ನಿಂತ ಸ್ಥಳವಿದೆ",
+    vNoSafeSub: "ಸಾಧ್ಯವಾದರೆ ಕಾಯಿರಿ ಅಥವಾ ಸಾರ್ವಜನಿಕ ಸಾರಿಗೆ ಬಳಸಿ.",
+    routeOption: (i) => `ದಾರಿ ${i + 1}`,
+    fastest: "ವೇಗದ್ದು", recommended: "ಶಿಫಾರಸು",
+    passes: (n) => (n ? `${n} ಅಪಾಯದ ಸ್ಥಳ` : "ಅಪಾಯದ ಸ್ಥಳಗಳಿಲ್ಲ"),
+    copilot: "ಕಾರ್ಯಾಚರಣೆ ಸಹಾಯಕ",
+    getBriefing: "ಕಾರ್ಯಾಚರಣೆ ವರದಿ ಪಡೆಯಿರಿ",
+    briefingLoading: "ಸಹಾಯಕ ಪಟ್ಟಿ ಮತ್ತು ನಾಗರಿಕರ ವರದಿಗಳನ್ನು ಓದುತ್ತಿದೆ…",
+    briefingFailed: "ಸದ್ಯಕ್ಕೆ ವರದಿ ಲಭ್ಯವಿಲ್ಲ.",
+    priorityList: "ಆದ್ಯತೆಯ ಪಟ್ಟಿ",
+    generatedAt: (m, cached) => `${m < 1 ? "ಈಗಷ್ಟೇ" : `${m} ನಿಮಿಷಗಳ ಹಿಂದೆ`}${cached ? " · ಉಳಿಸಿದ್ದು" : ""}`,
+    actions: { deploy_pump: "ಪಂಪ್", divert_traffic: "ತಿರುಗಿಸಿ", close_underpass: "ಮುಚ್ಚಿ", clear_drain: "ಚರಂಡಿ", monitor: "ಗಮನಿಸಿ" },
   },
 };
 
@@ -115,6 +167,7 @@ const state = {
   reportPos: null,
   map: null,
   markers: {},
+  route: { mode: null, from: null, to: null, layers: [], result: null },
 };
 
 function t(key, ...args) {
@@ -188,9 +241,9 @@ document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("cli
 function initMap() {
   state.map = L.map("map", { zoomControl: false }).setView([12.955, 77.64], 12);
   L.control.zoom({ position: "topright" }).addTo(state.map);
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Rain: <a href="https://open-meteo.com">Open-Meteo</a>',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Rain: <a href="https://open-meteo.com">Open-Meteo</a> · Routes: <a href="https://project-osrm.org">OSRM</a>',
   }).addTo(state.map);
 
   if (navigator.geolocation) {
@@ -259,6 +312,7 @@ function renderList() {
 
 function renderAll() {
   document.getElementById("replay-banner").hidden = !state.replay;
+  if (state.route.result) renderRouteResult();
   if (!state.map) return;
   renderMarkers();
   renderSummary();
@@ -471,8 +525,167 @@ async function loadOps() {
   }
 }
 
+
+// ---------------------------------------------------------------- safe route
+const ROUTE_COLORS = ["#1f6fb2", "#8a9aa6", "#b0bcc5"];
+
+function pinIcon(letter) {
+  return L.divIcon({ className: "", html: `<div class="pin ${letter.toLowerCase()}"><span>${letter}</span></div>`, iconSize: [26, 26], iconAnchor: [13, 26] });
+}
+
+function clearRouteLayers() {
+  state.route.layers.forEach((layer) => state.map.removeLayer(layer));
+  state.route.layers = [];
+}
+
+function setRouteStep(text) { document.getElementById("route-step").textContent = text; }
+
+function startRoute() {
+  clearRouteLayers();
+  Object.assign(state.route, { mode: "from", from: null, to: null, result: null });
+  document.getElementById("route-start").hidden = true;
+  document.getElementById("route-panel").hidden = false;
+  document.getElementById("sheet-default").hidden = true;
+  document.getElementById("route-from-me").hidden = !state.me;
+  document.getElementById("route-result").innerHTML = "";
+  setRouteStep(t("tapStart"));
+}
+
+function cancelRoute() {
+  clearRouteLayers();
+  Object.assign(state.route, { mode: null, from: null, to: null, result: null });
+  document.getElementById("route-start").hidden = false;
+  document.getElementById("route-panel").hidden = true;
+  document.getElementById("sheet-default").hidden = false;
+}
+
+function setPoint(which, latlng) {
+  state.route[which] = { lat: latlng.lat, lon: latlng.lng };
+  const marker = L.marker(latlng, { icon: pinIcon(which === "from" ? "A" : "B"), zIndexOffset: 1000 }).addTo(state.map);
+  state.route.layers.push(marker);
+  if (which === "from") {
+    state.route.mode = "to";
+    document.getElementById("route-from-me").hidden = true;
+    setRouteStep(t("tapEnd"));
+  } else {
+    state.route.mode = null;
+    checkRoute();
+  }
+}
+
+async function checkRoute() {
+  const { from, to } = state.route;
+  setRouteStep(t("routing"));
+  try {
+    const query = `from=${from.lat.toFixed(5)},${from.lon.toFixed(5)}&to=${to.lat.toFixed(5)},${to.lon.toFixed(5)}`;
+    const { body } = await api(`/route?${query}`);
+    if (!body.routes || !body.routes.length) throw new Error(body.error || t("routeFailed"));
+    state.route.result = body;
+    drawRoutes(body);
+    renderRouteResult();
+    setRouteStep("");
+  } catch (err) {
+    setRouteStep(`${t("routeFailed")} (${err.message})`);
+  }
+}
+
+function drawRoutes(result) {
+  // other routes first (grey, underneath), recommended last (blue, on top)
+  const order = result.routes.map((r) => r.index).sort((a, b) => (a === result.recommended) - (b === result.recommended));
+  const bounds = [];
+  order.forEach((index, drawn) => {
+    const r = result.routes[index];
+    const latlngs = r.geometry.map(([lon, lat]) => [lat, lon]);
+    latlngs.forEach((p) => bounds.push(p));
+    const best = index === result.recommended;
+    const line = L.polyline(latlngs, {
+      color: best ? ROUTE_COLORS[0] : ROUTE_COLORS[Math.min(drawn + 1, 2)],
+      weight: best ? 7 : 5, opacity: best ? 0.95 : 0.7, dashArray: best ? null : "8 8",
+    }).addTo(state.map).on("click", () => highlightRoute(index));
+    state.route.layers.push(line);
+  });
+  // ring the spots the fastest route would have taken you through
+  result.avoided.forEach((p) => {
+    const ring = L.circleMarker([p.lat, p.lon], { radius: 16, color: "#d33b32", weight: 3, fill: false, dashArray: "4 4" }).addTo(state.map);
+    state.route.layers.push(ring);
+  });
+  state.map.fitBounds(bounds, { padding: [40, 40] });
+}
+
+function highlightRoute(index) {
+  const route = state.route.result.routes[index];
+  state.map.fitBounds(route.geometry.map(([lon, lat]) => [lat, lon]), { padding: [40, 40] });
+}
+
+function renderRouteResult() {
+  const r = state.route.result;
+  const names = r.avoided.map((p) => placeName(p)).join(", ");
+  const verdicts = {
+    clear: ["good", "✅ " + t("vClear"), t("vClearSub")],
+    detour_clear: ["good", "🧭 " + t("vDetour"), t("vDetourSub", r.extra_min, names || "—")],
+    caution: ["warn", "🟠 " + t("vCaution"), t("vCautionSub")],
+    no_safe_route: ["bad", "🔴 " + t("vNoSafe"), t("vNoSafeSub")],
+  };
+  const [tone, title, sub] = verdicts[r.verdict] || verdicts.caution;
+  const options = r.routes.map((route) => {
+    const tags = [route.index === r.recommended ? t("recommended") : "", route.is_fastest ? t("fastest") : ""].filter(Boolean).join(" · ");
+    const risky = route.passes.filter((p) => p.level !== "green");
+    const where = risky.slice(0, 2).map((p) => placeName(p)).join(", ");
+    const color = route.index === r.recommended ? ROUTE_COLORS[0] : ROUTE_COLORS[1];
+    return `<div class="route-option ${route.index === r.recommended ? "best" : ""}" data-index="${route.index}">
+      <span class="swatch" style="background:${color}"></span>
+      <span><b>${route.duration_min.toFixed(0)} min</b> · ${route.distance_km.toFixed(1)} km</span>
+      <span class="tag">${esc(tags || t("routeOption", route.index))}</span>
+      <span class="meta">${route.red ? "🔴 " : route.amber ? "🟠 " : "🟢 "}${esc(t("passes", risky.length))}${where ? ": " + esc(where) : ""}</span>
+    </div>`;
+  }).join("");
+  document.getElementById("route-result").innerHTML = `
+    <div class="route-verdict ${tone}"><h3>${esc(title)}</h3><p>${esc(sub)}</p></div>
+    ${options}
+    ${r.storm_replay ? `<p class="small muted">${t("replay")}</p>` : ""}`;
+  document.querySelectorAll(".route-option").forEach((el) => el.addEventListener("click", () => highlightRoute(Number(el.dataset.index))));
+}
+
+document.getElementById("route-start").addEventListener("click", startRoute);
+document.getElementById("route-cancel").addEventListener("click", cancelRoute);
+document.getElementById("route-from-me").addEventListener("click", () => {
+  if (state.me) setPoint("from", { lat: state.me.lat, lng: state.me.lon });
+});
+
+// ---------------------------------------------------------------- ops copilot
+async function loadBriefing(force = false) {
+  const box = document.getElementById("briefing");
+  const button = document.getElementById("briefing-btn");
+  button.disabled = true;
+  box.innerHTML = `<p class="muted small">${t("briefingLoading")}</p>`;
+  try {
+    const { body: b } = await api("/ops/briefing", { method: "POST", body: JSON.stringify({ force }) });
+    const minutes = Math.max(0, Math.round((Date.now() - Date.parse(b.generated_at)) / 60000));
+    const actions = (b.actions || []).map((a) => `
+      <li><span class="act ${esc(a.action)}">${esc(t("actions")[a.action] || a.action)}</span>
+      <b>${esc(a.name)}</b><span class="reason">${esc(a.reason)}</span></li>`).join("");
+    const summary = state.lang === "kn" ? b.summary_kn : b.summary_en;
+    const trace = (b.tools_used || []).map((name) => `<span>→ ${esc(name)}</span>`).join("");
+    box.innerHTML = `
+      <p class="headline">${esc(b.headline)}</p>
+      ${actions ? `<ul class="actions">${actions}</ul>` : ""}
+      <div class="summary-box">${esc(summary)}</div>
+      ${trace ? `<div class="trace">${trace}</div>` : ""}
+      <p class="meta">${t("generatedAt", minutes, b.cached)}${b.source === "fallback" ? " · fallback" : ""}</p>`;
+  } catch (err) {
+    box.innerHTML = `<p class="muted small">${t("briefingFailed")} ${esc(err.message)}</p>`;
+  } finally {
+    button.disabled = false;
+  }
+}
+document.getElementById("briefing-btn").addEventListener("click", () => loadBriefing());
+
 // ---------------------------------------------------------------- start
 initMap();
+state.map.on("click", (e) => {
+  if (state.route.mode === "from") setPoint("from", e.latlng);
+  else if (state.route.mode === "to") setPoint("to", e.latlng);
+});
 applyLanguage();
 loadHotspots();
 setInterval(() => {

@@ -2,7 +2,7 @@
 
 **Project:** Neeru (ನೀರು) — know before you ride into it
 **Track:** Heat and Water (monsoon waterlogging, floods)
-**Team:** QuantumEffect — Pratham Patil, Rishikesh Bulagouda
+**Team:** QuantumEffect — Pratham Patil (solo)
 **Live app:** <Amplify URL> · **Bot:** @<bot_username> · **Repo:** <GitHub URL> · **Video:** <YouTube URL>
 
 ## The problem
@@ -17,7 +17,11 @@ falls, people stranded. Official alerts are city-wide ("heavy rain expected") an
   checks that it is a real street photo, estimates depth in rider terms (ankle / tyre-hub / knee), compares
   it with live rainfall and nearby reports, and only then updates the map. Reports far from known spots
   add new spots.
-- **Ward engineers:** a dispatch list ranked by risk × road importance × verified reports, and SNS alerts.
+- **Safe Route:** tap a start and a destination. Neeru checks the fastest route and its alternatives against live
+  flood risk and recommends the safest one, saying exactly which flooded spot it avoids and how many minutes it costs.
+- **Ward engineers:** a dispatch list ranked by risk × road importance × verified reports, SNS alerts, and an
+  **Ops Copilot**, a second Strands agent that writes a dispatch briefing (pump here, divert there, and why) in
+  English and Kannada. It is constrained so it can only name spots and actions that exist in the data.
 
 The risk model is deliberately explainable: rain still on the road (decayed by each spot's drainage) plus
 rain forecast for the next 3 hours, against a per-spot flood threshold. Verified photos can override the
@@ -26,7 +30,7 @@ forecast for local cloudbursts, and they recalibrate the threshold, so the map i
 ## Where AWS fits
 | Service | Role |
 |---|---|
-| Strands Agents SDK (AWS open source) | Verifier agent: tools for rainfall, nearby reports, structured verdict |
+| Strands Agents SDK (AWS open source) | Two agents: the photo verifier (rainfall, nearby reports, structured verdict) and the Ops Copilot (dispatch list, spot reports, structured briefing) |
 | Amazon Bedrock (Claude Haiku 4.5) | Vision + reasoning for photo verification, replies in Kannada/English |
 | AWS Lambda | API, Telegram webhook, 15-minute risk refresh |
 | Amazon API Gateway (HTTP API) | Public API + bot webhook, throttled |
@@ -35,6 +39,7 @@ forecast for local cloudbursts, and they recalibrate the threshold, so the map i
 | Amazon EventBridge | Schedules the refresh every 15 minutes |
 | Amazon SNS | Red alerts to ops email/SMS |
 | AWS Amplify Hosting | Web app |
+| Amazon CloudWatch + AWS X-Ray | Custom metrics (EMF), dashboard, alarm on bot errors, tracing on every function |
 | AWS SAM | Infrastructure as code, one-command deploy |
 
 ## What fought back
@@ -43,9 +48,9 @@ forecast for local cloudbursts, and they recalibrate the threshold, so the map i
 
 ## Limitations and next steps
 Seed hotspots are approximate and thresholds are starting guesses that citizen reports correct. Open-Meteo is a
-global model, so citizen photos matter most for very local storms. Next: WhatsApp channel, route-level checks
-("is my commute safe?"), and sharing the dispatch list with BBMP ward engineers for a pilot.
+global model, so citizen photos matter most for very local storms. Safe Route uses the public OSRM server with car routing; production would self-host OSRM with a two-wheeler profile.
+Next: a WhatsApp channel, Safe Route inside the bot, and a pilot with BBMP ward engineers using the Ops Copilot briefing.
 
 ## AI tools used
 Claude (Anthropic) was used to help scaffold the code, tests and documentation. All code was reviewed, run and
-deployed by the team.
+deployed by me.
