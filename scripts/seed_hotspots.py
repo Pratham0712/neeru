@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parent.parent
 def main() -> None:
     reset = "--reset-thresholds" in sys.argv
     table = boto3.resource("dynamodb", region_name="ap-south-1").Table(outputs()["HotspotsTableName"])
-    spots = json.loads((ROOT / "data" / "hotspots.json").read_text(), parse_float=Decimal)
+    spots = json.loads((ROOT / "data" / "hotspots.json").read_text(encoding="utf-8"), parse_float=Decimal)
 
     for spot in spots:
         existing = table.get_item(Key={"id": spot["id"]}).get("Item")

@@ -66,7 +66,7 @@ def create_fake_aws() -> None:
     engine.reset_clients()
 
     table = boto3.resource("dynamodb", region_name="ap-south-1").Table(config.HOTSPOTS_TABLE)
-    for spot in json.loads((ROOT / "data" / "hotspots.json").read_text(), parse_float=Decimal):
+    for spot in json.loads((ROOT / "data" / "hotspots.json").read_text(encoding="utf-8"), parse_float=Decimal):
         table.put_item(Item=spot)
 
 
